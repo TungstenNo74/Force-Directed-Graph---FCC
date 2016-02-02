@@ -7,8 +7,36 @@
            
        </style>
        <body>
-           <script src="http://d3js.org/d3.v3.min.js"></script>
+           <script src="https://d3js.org/d3.v3.min.js"></script>
            <script type="text/javascript">
+               
+var height = 640,
+    width = 480,
+    margin = {
+        "top": 10,
+        "bottom": 10,
+        "left": 10,
+        "right": 10
+    },
+    padding = {
+        "top": 10,
+        "bottom": 10,
+        "left": 10,
+        "right": 10
+    };
+    
+var force = null,
+    nodes = null,
+    links = null;
+        
+if(d3) console.log("I'm here!"); else console.log("oops!");
+
+var svg = d3.select("body").append("g")
+        .attr("transform", "translate(" + margin.left +"," + margin.top +")")
+    .append("svg")
+        .attr("width", width - margin.left - margin.right)
+        .attr("height", height - margin.top - margin.bottom);
+svg.append("text").text("I work!").attr("alignment-baseline", "middle");
                
            </script>
 
