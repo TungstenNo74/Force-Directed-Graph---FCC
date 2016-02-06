@@ -68,8 +68,10 @@ d3.json("http://www.freecodecamp.com/news/hot", function(error, graph){
         .attr("width", 20)
         .attr("height", 20);
 
-        node.append("text")
-            .text(function(d){ return d.author.username });
+    node
+      .append("text")
+        .attr("alignment-baseline", "middle")
+        .text(function(d){ return d.author.username });
 
     force.on("tick", function(){
 
