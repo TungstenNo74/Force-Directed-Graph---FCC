@@ -4,12 +4,12 @@
        <meta charset="utf-8">
        <title>Force Directed Graph - FCC</title>
        <style type="text/css">
-           
+
        </style>
        <body>
            <script src="https://d3js.org/d3.v3.min.js"></script>
            <script type="text/javascript">
-               
+
 var height = 640,
     width = 480,
     margin = {
@@ -24,21 +24,14 @@ var height = 640,
         "left": 10,
         "right": 10
     };
-    
-var force = null,
-    nodes = null,
-    links = null;
-        
-if(d3) console.log("I'm here!"); else console.log("oops!");
 
 var svg = d3.select("body").append("g")
         .attr("transform", "translate(" + margin.left +"," + margin.top +")")
     .append("svg")
         .attr("width", width - margin.left - margin.right)
         .attr("height", height - margin.top - margin.bottom);
-svg.append("text").text("I work!").attr("alignment-baseline", "middle");
-               
+
            </script>
 
        </body>
-   </head> 
+   </head>
