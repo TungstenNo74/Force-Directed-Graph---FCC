@@ -1,37 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
+ <head>
        <meta charset="utf-8">
        <title>Force Directed Graph - FCC</title>
        <style type="text/css">
 
-       </style>
-       <body>
-           <script src="https://d3js.org/d3.v3.min.js"></script>
-           <script type="text/javascript">
+       .link{
+           stroke: #999;
+           stroke-opacity: 0.6;
+       }
 
-var height = 640,
-    width = 480,
+       </style>
+ </head>
+ <body>
+     <script src="https://d3js.org/d3.v3.min.js"></script>
+     <script type="text/javascript">
+
+var height = 500,
+    width = 960,
     margin = {
         "top": 10,
         "bottom": 10,
         "left": 10,
         "right": 10
-    },
-    padding = {
-        "top": 10,
-        "bottom": 10,
-        "left": 10,
-        "right": 10
-    };
+  };
 
-var svg = d3.select("body").append("g")
-        .attr("transform", "translate(" + margin.left +"," + margin.top +")")
-    .append("svg")
+var svg = d3.select("body").append("svg")
+        .attr("xmlns","http://www.w3.org/2000/svg")
+        .attr("xmlns:xlink","http://www.w3.org/1999/xlink")
         .attr("width", width - margin.left - margin.right)
-        .attr("height", height - margin.top - margin.bottom);
+        .attr("height", height - margin.top - margin.bottom)
+    .append("g")
+        .attr("transform", "translate(" + margin.left +"," + margin.top +")");
 
-           </script>
+var force = d3.layout.force()
+    .charge(-120)
+    .linkDistance(30)
+    .size([width, height]);
 
-       </body>
-   </head>
+d3.json("http://www.freecodecamp.com/news/hot", function(error, graph){
+
+    if (error) throw error;
+
+    force
+        .nodes(graph)
+        .start();
+
+    var node = svg.selectAll(".node")
+            .data(graph)
+        .enter().append("g")
+            .attr("class", "node")
+            .call(force.drag);
+    var defs = svg.append("defs");
+
+    defs
+      .append("clipPath")
+        .attr("id", "circleClip")
+      .append("circle")
+        .attr("cx", 10)
+        .attr("cy", 10)
+        .attr("r", 10);
+
+    node
+      .append("svg:image")
+        .attr("xlink:href", function(d){ return d.author.picture; })
+        .attr("clip-path","url(#circleClip)")
+        .attr("width", 20)
+        .attr("height", 20);
+
+        node.append("text")
+            .text(function(d){ return d.author.username });
+
+    force.on("tick", function(){
+
+        node.attr("transform",
+        function(d){ return "translate(" + d.x + "," + d.y +")"});
+
+    });
+});
+ </script>
+
+ </body>
