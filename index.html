@@ -38,9 +38,21 @@ var force = d3.layout.force()
     .linkDistance(30)
     .size([width, height]);
 
-d3.json("http://www.freecodecamp.com/news/hot", function(error, graph){
+d3.json("fccNew.json", function(error, graph){
 
     if (error) throw error;
+    
+var authors = graph.map(function(a){ return a.author.username; });
+authors = uniq(authors.sort());
+console.log(authors);
+
+var domains = graph.map(function(a){ return a.link; });
+for (var i = 0; i < domains.length; i++){
+    domains[i] = extractDomain(domains[i]).replace("www.", "");
+}
+domains = uniq(domains.sort());
+
+console.log(domains);
 
     force
         .nodes(graph)
@@ -80,6 +92,30 @@ d3.json("http://www.freecodecamp.com/news/hot", function(error, graph){
 
     });
 });
+
+function uniq(a) {
+    var seen = {};
+    return a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+}
+    
+function extractDomain(url) {
+    var domain;
+    //find & remove protocol (http, ftp, etc.) and get domain
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+
+    //find & remove port number
+    domain = domain.split(':')[0];
+
+    return domain;
+}
+
  </script>
 
  </body>
