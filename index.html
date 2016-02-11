@@ -14,6 +14,7 @@
  </head>
  <body>
      <script src="https://d3js.org/d3.v3.min.js"></script>
+     <script type="text/javascript" src="helpers.js"></script>
      <script type="text/javascript">
 
 var height = 500,
@@ -24,6 +25,9 @@ var height = 500,
         "left": 10,
         "right": 10
   };
+/* global d3*/
+/* global extractDomain */
+/* global uniq */
 
 var svg = d3.select("body").append("svg")
         .attr("xmlns","http://www.w3.org/2000/svg")
@@ -41,28 +45,55 @@ var force = d3.layout.force()
 d3.json("fccNew.json", function(error, graph){
 
     if (error) throw error;
+   
+    //Get a list of all authors in posts 
+    var authors = graph.map(function(a){ return a.author.username; });
     
-var authors = graph.map(function(a){ return a.author.username; });
-authors = uniq(authors.sort());
-console.log(authors);
+    //Get inly uniq usernames and sort alphabetically
+    authors = uniq(authors.sort());
 
-var domains = graph.map(function(a){ return a.link; });
-for (var i = 0; i < domains.length; i++){
-    domains[i] = extractDomain(domains[i]).replace("www.", "");
-}
-domains = uniq(domains.sort());
+    //Get a list of all domains
+    var domains = graph.map(function(a){ return a.link; });
+    
+    //Extract just the domain name
+    for (var i = 0; i < domains.length; i++){
+        domains[i] = extractDomain(domains[i]).replace("www.", "");
+    }
+    
+    //Get only unique domains and sort alphabetically
+    domains = uniq(domains.sort());
+    
+    
+    //Join both domain and usernames into a single array. This will be the source
+    //for our nodes
+    var combinedArray = domains.concat(authors);
+    console.log(combinedArray);
+    
+    var links = [];
+    for (var i = 0; i < graph.length ; i++){
+        var link = {
+            source: authors.indexOf(graph[i].author.username),
+            target: domains.indexOf(extractDomain(graph[i].link).replace("www.", ""))
+        };
+        links.push(link);
+    };
+    console.log(links);
 
-console.log(domains);
 
     force
-        .nodes(graph)
+        .nodes(authors)
         .start();
 
     var node = svg.selectAll(".node")
-            .data(graph)
+            .data(authors)
         .enter().append("g")
             .attr("class", "node")
+            .attr("class", function(d){
+                if (authors.indexOf(d) > -1) return "author";
+                else return "domain";
+            })
             .call(force.drag);
+            
     var defs = svg.append("defs");
 
     defs
@@ -73,14 +104,14 @@ console.log(domains);
         .attr("cy", 10)
         .attr("r", 10);
 
-    node
+    node.selectAll(".author")
       .append("svg:image")
         .attr("xlink:href", function(d){ return d.author.picture; })
         .attr("clip-path","url(#circleClip)")
         .attr("width", 20)
         .attr("height", 20);
 
-    node
+    node.selectAll(".author")
       .append("text")
         .attr("alignment-baseline", "middle")
         .text(function(d){ return d.author.username });
@@ -93,28 +124,7 @@ console.log(domains);
     });
 });
 
-function uniq(a) {
-    var seen = {};
-    return a.filter(function(item) {
-        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-    });
-}
     
-function extractDomain(url) {
-    var domain;
-    //find & remove protocol (http, ftp, etc.) and get domain
-    if (url.indexOf("://") > -1) {
-        domain = url.split('/')[2];
-    }
-    else {
-        domain = url.split('/')[0];
-    }
-
-    //find & remove port number
-    domain = domain.split(':')[0];
-
-    return domain;
-}
 
  </script>
 
